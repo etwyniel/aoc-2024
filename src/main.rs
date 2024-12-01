@@ -2,8 +2,10 @@ use std::env::args;
 
 use aoc_framework::*;
 
+mod day01;
+
 fn main() -> anyhow::Result<()> {
-    let days = [];
+    let days = [day01::Day01::run];
 
     let token = std::env::var("AOC_TOKEN").ok();
 

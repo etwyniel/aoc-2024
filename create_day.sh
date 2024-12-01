@@ -9,5 +9,5 @@ day_file=src/day$day.rs
 cp template.rs "$day_file"
 sd W $day "$day_file"
 
-sd 'fn main' "mod day$day;\nuse day$day::Day$day;\n\nfn main" src/main.rs
-sd ']' "Day$day::run,\n]" src/main.rs
+sd 'fn main' "mod day$day;\n\nfn main" src/main.rs
+sd ']' "day$day::Day$day::run,\n]" src/main.rs
