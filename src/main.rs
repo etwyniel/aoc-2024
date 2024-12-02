@@ -4,8 +4,10 @@ use aoc_framework::*;
 
 mod day01;
 
+mod day02;
+
 fn main() -> anyhow::Result<()> {
-    let days = [day01::Day01::run];
+    let days = [day01::Day01::run, day02::Day02::run];
 
     let token = std::env::var("AOC_TOKEN").ok();
 

@@ -13,31 +13,38 @@ impl_day!(Day01::{part1, part2}: 2024[1], r"
 3   3
 ");
 
-#[aoc(part = 1, example = 11)]
-fn part1(input: impl Iterator<Item = String>) -> u64 {
-    let mut left = BinaryHeap::new();
-    let mut right = BinaryHeap::new();
-    input
+#[aoc(part = 1, example = 11, benchmark = 10_000)]
+fn part1(input: &str) -> u64 {
+    let (mut left, mut right) = input
+        .lines()
         .flat_map(|ln| {
-            ln.split_once(' ')
-                .map(|(l, r)| (l.parse::<i64>().unwrap(), r.trim().parse::<i64>().unwrap()))
+            ln.split_once("   ")
+                .and_then(|(l, r)| Some((l.parse::<i64>().ok()?, r.parse::<i64>().ok()?)))
         })
-        .for_each(|(l, r)| {
-            left.push(l);
-            right.push(r);
-        });
+        .fold(
+            (
+                BinaryHeap::with_capacity(1000),
+                BinaryHeap::with_capacity(1000),
+            ),
+            |(mut left, mut right), (l, r)| {
+                left.push(l);
+                right.push(r);
+                (left, right)
+            },
+        );
     let mut total = 0;
     while let Some((l, r)) = left.pop().zip(right.pop()) {
-        total += (l - r).unsigned_abs();
+        total += l.abs_diff(r);
     }
     total
 }
 
-#[aoc(part = 2, example = 31)]
-fn part2(input: impl Iterator<Item = String>) -> u64 {
-    let mut left = HashMap::<_, u64>::new();
-    let mut right = HashMap::<_, u64>::new();
+#[aoc(part = 2, example = 31, benchmark = 10_000)]
+fn part2(input: &str) -> u64 {
+    let mut left = HashMap::<_, u64>::with_capacity(1000);
+    let mut right = HashMap::<_, u64>::with_capacity(1000);
     input
+        .lines()
         .flat_map(|ln| {
             ln.split_once(' ')
                 .map(|(l, r)| (l.parse::<u64>().unwrap(), r.trim().parse::<u64>().unwrap()))
