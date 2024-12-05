@@ -17,15 +17,15 @@ MAMMMXMMMM
 MXMXAXMASX
 ");
 
-const DELTAS: [(isize, isize); 8] = [
-    (0, 1),
-    (1, 0),
-    (0, -1),
-    (-1, 0),
-    (1, 1),
-    (1, -1),
-    (-1, 1),
-    (-1, -1),
+const DELTAS: [[isize; 2]; 8] = [
+    [0, 1],
+    [1, 0],
+    [0, -1],
+    [-1, 0],
+    [1, 1],
+    [1, -1],
+    [-1, 1],
+    [-1, -1],
 ];
 const LETTERS: [u8; 4] = [b'X', b'M', b'A', b'S'];
 
@@ -35,11 +35,16 @@ fn count_xmas(g: &Grid<u8, 2>) -> u64 {
         .map(|p| {
             DELTAS
                 .into_iter()
-                .map(|(dx, dy)| Point([dx, dy]))
+                .map(Point)
                 .filter(|&d| (1..4).all(|i| g.get(p + d * i) == Some(&LETTERS[i as usize])))
                 .count()
         })
         .sum::<usize>() as u64
+}
+#[aoc(part = 1, example = 18)]
+fn part1(input: Vec<u8>) -> u64 {
+    let g = Grid::from_bytes(input);
+    count_xmas(&g)
 }
 
 const DIAG_DELTAS: [[isize; 2]; 2] = [[1, 1], [1, -1]];
@@ -55,12 +60,6 @@ fn count_x_mas(g: &Grid<u8, 2>) -> u64 {
                 .all(|v| matches!(v, Some((b'M', b'S') | (b'S', b'M'))))
         })
         .count() as u64
-}
-
-#[aoc(part = 1, example = 18)]
-fn part1(input: Vec<u8>) -> u64 {
-    let g = Grid::from_bytes(input);
-    count_xmas(&g)
 }
 
 #[aoc(part = 2, example = 9)]
