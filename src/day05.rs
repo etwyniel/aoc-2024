@@ -117,7 +117,7 @@ fn part2(mut input: impl Iterator<Item = String>) -> u64 {
         if correct {
             continue;
         }
-        pages.sort_by(|&y, &x| {
+        pages.sort_unstable_by(|&y, &x| {
             if prec.is_before(y, x) {
                 Ordering::Less
             } else {
