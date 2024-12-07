@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 aoc-framework = {git = "https://github.com/etwyniel/aoc-framework"}
 itertools = "0.10.5"
+rayon = "1.10.0"
 smallvec = "1.11.2"
 
 [profile.release]

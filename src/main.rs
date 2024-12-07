@@ -14,6 +14,8 @@ mod day05;
 
 mod day06;
 
+mod day07;
+
 fn main() -> anyhow::Result<()> {
     let days = [
         day01::Day01::run,
@@ -22,6 +24,7 @@ fn main() -> anyhow::Result<()> {
         day04::Day04::run,
         day05::Day05::run,
     day06::Day06::run,
+day07::Day07::run,
 ];
 
     let token = std::env::var("AOC_TOKEN").ok();

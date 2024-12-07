@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use std::collections::HashSet;
 
 use aoc_framework::*;
@@ -44,32 +45,30 @@ fn part1(input: Vec<u8>) -> u64 {
 
 #[aoc(part = 2, example = 6)]
 fn part2(input: Vec<u8>) -> u64 {
-    let mut g = Grid::from_bytes(input);
-    let mut valid = 0;
+    let g = Grid::from_bytes(input);
     let start_pos = g.points_iter().find(|&p| g[p] == b'^').unwrap();
-    for p in trace_path(&g) {
-        if p == start_pos {
-            continue;
-        }
-        let prev = g[p];
-        g.set(p, b'#');
-        let mut pos = start_pos;
-        let mut dir = Direction::NORTH;
-        let mut visited = HashSet::new();
-        while g.in_bounds(pos) {
-            if visited.contains(&(pos, dir)) {
-                valid += 1;
-                break;
+    trace_path(&g)
+        .into_par_iter()
+        .filter(|&p| {
+            if p == start_pos {
+                return false;
             }
-            visited.insert((pos, dir));
-            let mut next = pos + dir;
-            while let Some(b'#') = g.get(next) {
-                dir += 1;
-                next = pos + dir;
+            let mut pos = start_pos;
+            let mut dir = Direction::NORTH;
+            let mut visited = HashSet::with_capacity(1000);
+            while g.in_bounds(pos) {
+                if visited.contains(&(pos, dir)) {
+                    return true;
+                }
+                visited.insert((pos, dir));
+                let mut next = pos + dir;
+                while p == next || Some(&b'#') == g.get(next) {
+                    dir += 1;
+                    next = pos + dir;
+                }
+                pos = next;
             }
-            pos = next;
-        }
-        g.set(p, prev);
-    }
-    valid
+            false
+        })
+        .count() as u64
 }
