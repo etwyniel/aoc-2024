@@ -36,7 +36,7 @@ dependencies = [
 [[package]]
 name = "aoc-base"
 version = "0.1.0"
-source = "git+https://github.com/etwyniel/aoc-framework#77b0949d9765290537bfdb4887c60e6fa7a2b9bb"
+source = "git+https://github.com/etwyniel/aoc-framework#1553ab7672ea14c1491f4bc04d1aca8090611303"
 dependencies = [
  "anyhow",
  "itertools",
@@ -46,7 +46,7 @@ dependencies = [
 [[package]]
 name = "aoc-derive"
 version = "0.1.0"
-source = "git+https://github.com/etwyniel/aoc-framework#77b0949d9765290537bfdb4887c60e6fa7a2b9bb"
+source = "git+https://github.com/etwyniel/aoc-framework#1553ab7672ea14c1491f4bc04d1aca8090611303"
 dependencies = [
  "aoc-base",
  "proc-macro2",
@@ -57,7 +57,7 @@ dependencies = [
 [[package]]
 name = "aoc-framework"
 version = "0.1.0"
-source = "git+https://github.com/etwyniel/aoc-framework#77b0949d9765290537bfdb4887c60e6fa7a2b9bb"
+source = "git+https://github.com/etwyniel/aoc-framework#1553ab7672ea14c1491f4bc04d1aca8090611303"
 dependencies = [
  "anyhow",
  "aoc-base",

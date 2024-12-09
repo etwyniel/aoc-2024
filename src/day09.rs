@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 
 use aoc_framework::*;
+use stackvec::StackVec;
 
 pub struct Day09;
 
@@ -42,7 +43,7 @@ fn part1(input: &str) -> u64 {
 }
 
 struct Block {
-    values: Vec<(u8, usize)>,
+    values: StackVec<(u8, u16), 9>,
     free: u8,
 }
 
@@ -88,10 +89,9 @@ fn part2(input: &str) -> u64 {
             continue;
         }
         if i % 2 == 0 {
-            blocks.push(Block {
-                values: vec![(n, i / 2)],
-                free: 0,
-            });
+            let mut values = StackVec::new();
+            values.push((n, (i / 2) as u16));
+            blocks.push(Block { values, free: 0 });
         } else {
             blocks.last_mut().unwrap().free += n;
         }
@@ -105,9 +105,9 @@ fn part2(input: &str) -> u64 {
             if free >= i {
                 continue;
             }
-            let blk = &mut blocks[free];
-            blk.free -= size;
-            blk.values.push((size, b));
+            let dst_blk = &mut blocks[free];
+            dst_blk.free -= size;
+            dst_blk.values.push((size, b));
             let old_blk = &mut blocks[i];
             if j == old_blk.values.len() - 1 {
                 old_blk.free += size;
@@ -116,6 +116,8 @@ fn part2(input: &str) -> u64 {
                 old_blk.values.remove(0);
                 blocks[i - 1].free += size;
             } else {
+                // would need to split old_blk
+                // this case doesn't appear to occur ever
                 panic!("I didn't bother with this case")
             }
         }
@@ -123,9 +125,9 @@ fn part2(input: &str) -> u64 {
     let mut sum = 0;
     let mut pos = 0;
     for blk in blocks {
-        for (size, b) in blk.values {
+        for &(size, b) in blk.values.iter() {
             for _ in 0..size {
-                sum += pos * b;
+                sum += pos * b as usize;
                 pos += 1;
             }
         }
