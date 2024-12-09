@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use aoc_framework::*;
 
 pub struct Day09;
@@ -39,6 +41,44 @@ fn part1(input: &str) -> u64 {
     checksum(blocks)
 }
 
+struct Block {
+    values: Vec<(u8, usize)>,
+    free: u8,
+}
+
+impl Debug for Block {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if !self.values.is_empty() {
+            write!(f, "(")?
+        }
+        for (i, (size, b)) in self.values.iter().enumerate() {
+            if i > 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{}x{}", size, b)?;
+        }
+        if !self.values.is_empty() {
+            write!(f, ")")?
+        }
+        if self.free > 0 {
+            write!(f, "+{}", self.free)?;
+        }
+        Ok(())
+    }
+}
+
+fn update_first_frees(blocks: &[Block], first_frees: &mut [usize; 9]) {
+    let mut last = 0;
+    for (n, f) in first_frees.iter_mut().enumerate() {
+        let mut ndx = (*f).max(last);
+        while ndx < blocks.len() && blocks[ndx].free < n as u8 + 1 {
+            ndx += 1;
+        }
+        *f = ndx;
+        last = ndx;
+    }
+}
+
 #[aoc(part = 2, example = 2858)]
 fn part2(input: &str) -> u64 {
     let mut blocks = Vec::new();
@@ -47,41 +87,49 @@ fn part2(input: &str) -> u64 {
         if n == 0 {
             continue;
         }
-        let block = if i % 2 == 0 { Some(i / 2) } else { None };
-        blocks.push((n, block));
+        if i % 2 == 0 {
+            blocks.push(Block {
+                values: vec![(n, i / 2)],
+                free: 0,
+            });
+        } else {
+            blocks.last_mut().unwrap().free += n;
+        }
     }
-    let mut move_cursor = blocks.len();
-    while move_cursor > 0 {
-        move_cursor -= 1;
-        let (size, Some(b)) = blocks[move_cursor] else {
-            continue;
-        };
-        let Some(free) = blocks.iter().position(|(sz, b)| *sz >= size && b.is_none()) else {
-            continue;
-        };
-        if free > move_cursor {
-            continue;
+    let mut first_frees = [0; 9];
+    for i in (0..blocks.len()).rev() {
+        for j in (0..blocks[i].values.len()).rev() {
+            let (size, b) = blocks[i].values[j];
+            update_first_frees(&blocks, &mut first_frees);
+            let free = first_frees[size as usize - 1];
+            if free >= i {
+                continue;
+            }
+            let blk = &mut blocks[free];
+            blk.free -= size;
+            blk.values.push((size, b));
+            let old_blk = &mut blocks[i];
+            if j == old_blk.values.len() - 1 {
+                old_blk.free += size;
+                old_blk.values.pop();
+            } else if j == 0 {
+                old_blk.values.remove(0);
+                blocks[i - 1].free += size;
+            } else {
+                panic!("I didn't bother with this case")
+            }
         }
-        blocks[move_cursor].1 = None;
-        if blocks[free].0 == size {
-            blocks[free].1 = Some(b);
-            continue;
-        }
-        blocks[free].0 -= size;
-        blocks.insert(free, (size, Some(b)));
-        move_cursor += 1;
     }
     let mut sum = 0;
     let mut pos = 0;
-    for (size, b) in blocks {
-        let Some(b) = b else {
-            pos += size as usize;
-            continue;
-        };
-        for _ in 0..size {
-            sum += pos * b;
-            pos += 1;
+    for blk in blocks {
+        for (size, b) in blk.values {
+            for _ in 0..size {
+                sum += pos * b;
+                pos += 1;
+            }
         }
+        pos += blk.free as usize;
     }
     sum as u64
 }
