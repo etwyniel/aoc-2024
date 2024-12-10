@@ -47,27 +47,6 @@ struct Block {
     free: u8,
 }
 
-impl Debug for Block {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if !self.values.is_empty() {
-            write!(f, "(")?
-        }
-        for (i, (size, b)) in self.values.iter().enumerate() {
-            if i > 0 {
-                write!(f, ", ")?;
-            }
-            write!(f, "{}x{}", size, b)?;
-        }
-        if !self.values.is_empty() {
-            write!(f, ")")?
-        }
-        if self.free > 0 {
-            write!(f, "+{}", self.free)?;
-        }
-        Ok(())
-    }
-}
-
 fn update_first_frees(blocks: &[Block], first_frees: &mut [usize; 9]) {
     let mut last = 0;
     for (n, f) in first_frees.iter_mut().enumerate() {
@@ -134,4 +113,24 @@ fn part2(input: &str) -> u64 {
         pos += blk.free as usize;
     }
     sum as u64
+}
+impl Debug for Block {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if !self.values.is_empty() {
+            write!(f, "(")?
+        }
+        for (i, (size, b)) in self.values.iter().enumerate() {
+            if i > 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{}x{}", size, b)?;
+        }
+        if !self.values.is_empty() {
+            write!(f, ")")?
+        }
+        if self.free > 0 {
+            write!(f, "+{}", self.free)?;
+        }
+        Ok(())
+    }
 }
