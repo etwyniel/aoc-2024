@@ -112,12 +112,10 @@ fn run_with_memo(nums: Vec<u64>, total_steps: u64) -> u64 {
     let mut stack = nums.iter().copied().map(|n| (total_steps, n)).collect_vec();
     let mut total = 0;
     while let Some((steps, n)) = stack.last().copied() {
-        if steps == 0 {
-            memo.insert((steps, n), 1);
-            stack.pop();
-            continue;
-        }
         let mut get_next = |(steps, n)| {
+            if steps == 0 {
+                return Some(1);
+            }
             if let Some(&count) = memo.get(&(steps, n)) {
                 return Some(count);
             }
