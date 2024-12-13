@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use aoc_framework::*;
 use direction::Direction;
 use grid::Grid;
-use point::{Point, Point2};
+use point::Point;
 
 pub struct Day12;
 
@@ -75,48 +75,38 @@ fn part2(input: Vec<u8>) -> u64 {
         let mut area = 0;
         stack.clear();
         stack.push(p);
-        let mut sides: HashMap<_, Vec<Point2>> = HashMap::new();
+        let mut sides: HashMap<_, Vec<isize>> = HashMap::new();
         while let Some(p) = stack.pop() {
             area += 1;
             for dir in (0..4).map(Direction::new) {
                 let neighbor = p + dir;
-                match g.get(neighbor) {
-                    Some(&val) if val == typ => {
-                        if !visited[neighbor] {
-                            stack.push(neighbor);
-                            visited.set(neighbor, true);
-                        }
+                if g.get(neighbor) == Some(&typ) {
+                    if !visited[neighbor] {
+                        stack.push(neighbor);
+                        visited.set(neighbor, true);
                     }
-                    _ => {
-                        let edge = if dir == Direction::NORTH || dir == Direction::SOUTH {
-                            (None, Some(p.y()), dir)
-                        } else {
-                            (Some(p.x()), None, dir)
-                        };
-                        sides.entry(edge).or_default().push(p);
-                    }
+                    continue;
                 }
+                let (k, v) = if dir == Direction::NORTH || dir == Direction::SOUTH {
+                    (p.y(), p.x())
+                } else {
+                    (p.x(), p.y())
+                };
+                sides.entry((k, dir)).or_default().push(v);
             }
         }
-        let perimeter: u64 = sides
+        let perimeter = sides
             .into_values()
             .map(|mut points| {
-                points.sort_by(|p1, p2| {
-                    if p1.x() == p2.x() {
-                        p1.y().cmp(&p2.y())
-                    } else {
-                        p1.x().cmp(&p2.x())
-                    }
-                });
-                points.into_iter().tuple_windows().fold(1, |acc, (p1, p2)| {
-                    if p1.dist_manhattan(p2) > 1 {
-                        acc + 1
-                    } else {
-                        acc
-                    }
-                })
+                points.sort_unstable();
+                points
+                    .into_iter()
+                    .tuple_windows()
+                    .map(|(p1, p2)| if p1.abs_diff(p2) > 1 { 1 } else { 0 })
+                    .sum::<u64>()
+                    + 1
             })
-            .sum();
+            .sum::<u64>();
         total += area * perimeter;
     }
     total
