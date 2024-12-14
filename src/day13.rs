@@ -63,14 +63,18 @@ impl Add for Equation {
     }
 }
 
-fn parse_button(ln: &str) -> Option<(i64, i64)> {
+fn parse_coords(ln: &str, symbol: char) -> Option<(i64, i64)> {
     ln.split_once(": ")?
         .1
         .split(", ")
-        .flat_map(|s| s.split_once('+').map(|(_, val)| val))
+        .flat_map(|s| s.split_once(symbol).map(|(_, val)| val))
         .flat_map(|val| val.parse().ok())
         .tuples()
         .next()
+}
+
+fn parse_button(ln: &str) -> Option<(i64, i64)> {
+    parse_coords(ln, '+')
 }
 
 struct System {
@@ -99,15 +103,7 @@ impl System {
 fn parse_system(mut input: impl Iterator<Item = String>) -> Option<System> {
     let (ax, ay) = parse_button(&input.next()?)?;
     let (bx, by) = parse_button(&input.next()?)?;
-    let (dx, dy) = input
-        .next()?
-        .split_once(": ")?
-        .1
-        .split(", ")
-        .flat_map(|s| s.split_once('=').map(|(_, val)| val))
-        .flat_map(|val| val.parse().ok())
-        .tuples()
-        .next()?;
+    let (dx, dy) = parse_coords(&input.next()?, '=')?;
     // skip empty line
     input.next();
     let ex = Equation {
