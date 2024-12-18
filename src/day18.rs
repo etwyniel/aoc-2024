@@ -105,6 +105,7 @@ fn part2(input: impl Iterator<Item = String>) -> String {
         .collect::<HashMap<_, _>>();
     let start = Point([0, 0]);
     let (end, t) = if bytes.len() < 1000 {
+        // working on example
         (Point([6, 6]), 12)
     } else {
         (Point([70, 70]), 1024)
@@ -112,7 +113,6 @@ fn part2(input: impl Iterator<Item = String>) -> String {
     let w = end.x() as usize + 1;
     let mut prev_path = HashSet::new();
     for (cur_time, last) in byte_list.iter().enumerate().skip(t) {
-        dbg!(cur_time);
         if !prev_path.is_empty() && !prev_path.contains(last) {
             continue;
         }
