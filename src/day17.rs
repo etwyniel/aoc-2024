@@ -1,7 +1,5 @@
 use aoc_framework::*;
 
-use rayon::prelude::*;
-
 pub struct Day17;
 
 impl_day!(Day17::{part1, part2}: 2024[17], r"
@@ -107,27 +105,6 @@ fn part1(input: impl Iterator<Item = String>) -> String {
     cpu.output.into_iter().join(",")
 }
 
-const TARGET: u64 = 0o2411751540550330;
-
-fn solve_p2(a: u64, tgt: u64) -> Option<u64> {
-    if tgt == 0 {
-        return Some(a);
-    }
-    for x in 0..8 {
-        let next_a = a << 3 | x;
-        let mut b = x ^ 1;
-        let c = next_a >> b;
-        b ^= 5;
-        b ^= c;
-        if b & 0b111 == tgt & 0b111 {
-            if let Some(res) = solve_p2(next_a, tgt >> 3) {
-                return Some(res);
-            }
-        }
-    }
-    None
-}
-
 fn solve_generic(a: u64, i: usize, cpu: &mut Cpu) -> Option<u64> {
     if i == cpu.program.len() {
         return Some(a);
@@ -139,6 +116,7 @@ fn solve_generic(a: u64, i: usize, cpu: &mut Cpu) -> Option<u64> {
         cpu.b = 0;
         cpu.c = 0;
         cpu.pc = 0;
+        cpu.output.clear();
         while let Some(res) = cpu.cycle() {
             if let Some(out) = res {
                 if out != target {
@@ -159,7 +137,6 @@ fn solve_generic(a: u64, i: usize, cpu: &mut Cpu) -> Option<u64> {
 
 #[aoc(part = 2, example = 117440)]
 fn part2(input: impl Iterator<Item = String>) -> u64 {
-    //solve_p2(0, TARGET).unwrap_or(0)
     let Some(mut cpu) = parse_cpu(input) else {
         return 0;
     };
@@ -170,73 +147,4 @@ fn part2(input: impl Iterator<Item = String>) -> u64 {
         .tuples::<(u8, u8)>()
         .contains(&(0, 3)));
     solve_generic(0, 0, &mut cpu).unwrap_or(0)
-    //let init_b = cpu.b;
-    //let init_c = cpu.b;
-    //(4000000000000..)
-    //    .step_by(1_000_000_000)
-    //    .par_bridge()
-    //    .find_map_first(|x| {
-    //        dbg!(x);
-    //        for i in 0..1_000_000_000 {
-    //            let mut a = x + i;
-    //            let mut out = 0;
-    //            let mut count = 0;
-    //            while a != 0 && (TARGET >> (48 - (3 * count))) == out {
-    //                let mut b = a % 8;
-    //                b ^= 1;
-    //                let c = a >> b;
-    //                b ^= 5;
-    //                b ^= c;
-    //                out = out << 3 | (b & 0b111);
-    //                a >>= 3;
-    //                count += 1;
-    //            }
-    //            if out == TARGET {
-    //                return Some(x + i);
-    //            }
-    //        }
-    //let mut cpu = cpu.clone();
-    //dbg!(x);
-    //'outer: for a in 0..100_000_000 {
-    //    cpu.a = a + x;
-    //    cpu.b = init_b;
-    //    cpu.c = init_c;
-    //    cpu.pc = 0;
-    //    cpu.output.clear();
-    //    while cpu.pc < cpu.program.len() {
-    //        if cpu.cycle().is_none() {
-    //            break;
-    //        }
-    //        if cpu.output.len() > cpu.program.len()
-    //            || cpu.output != cpu.program[0..cpu.output.len()]
-    //        {
-    //            continue 'outer;
-    //        }
-    //    }
-    //    if cpu.output == cpu.program {
-    //        return Some(a + x);
-    //    }
-    //}
-    //    None
-    //})
-    //.unwrap_or(0)
-    //for a in 0.. {
-    //    cpu.a = a;
-    //    cpu.b = init_b;
-    //    cpu.c = init_c;
-    //    cpu.pc = 0;
-    //    cpu.output.clear();
-    //    if a % 100_000 == 0 {
-    //        dbg!(a);
-    //    }
-    //    while cpu.pc < cpu.program.len() {
-    //        if cpu.cycle().is_none() {
-    //            break;
-    //        }
-    //    }
-    //    if cpu.output == cpu.program {
-    //        return a;
-    //    }
-    //}
-    //0
 }
