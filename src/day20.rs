@@ -97,11 +97,11 @@ fn part2(input: Vec<u8>) -> u64 {
                 let saved = t1.abs_diff(t2).saturating_sub((dy + dx.abs()) as u64);
                 if saved >= threshold {
                     //eprintln!("{p} -{saved:->3}-> {p2}");
-                    let inserted = if t1 < t2 {
-                        cheats.insert((p, p2))
+                    if t1 < t2 {
+                        cheats.insert((p, p2));
                     } else {
-                        cheats.insert((p2, p))
-                    };
+                        cheats.insert((p2, p));
+                    }
                     //if inserted {
                     //    histogram[saved as usize] += 1;
                     //}
